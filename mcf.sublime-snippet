@@ -1,0 +1,96 @@
+<snippet>
+    <content><![CDATA[
+ll cnt_ver = 0;
+
+vector <ll> V[maxn];
+
+struct edge {
+    ll v;
+    ll to;
+    ll r;
+    ll c;
+    ll f = 0;
+    ll cost = 0;
+};
+
+vector <edge> E;
+
+ll from, to;
+
+inline pvv fordbellman(ll v) { /// oriented graphs
+    vector <ll> D(cnt_ver, inf);
+    vector <ll> P(cnt_ver, -1);
+    D[v] = 0;
+    ll q, w;
+    for (q = 0; q < cnt_ver; q++) {
+        bool f = 0;
+        for (w = 0; w < E.size(); w++) {
+            if (E[w].f == E[w].c) {
+                continue;
+            }
+            if (D[E[w].v] < inf) {
+                ll dmn = D[E[w].v] + E[w].cost;
+                if (dmn < D[E[w].to]) {
+                    P[E[w].to] = w;
+                    D[E[w].to] = dmn;
+                    f = 1;
+                }
+            }
+        }
+        if (!f) {
+            break;
+        }
+    }
+    return mp(D, P);
+}
+
+pll mcf(ll bound = inf) { /// flow, cost
+    pll ans = mp(0LL, 0LL);
+    while (ans.first < bound) {
+        pvv p = fordbellman(from);
+        // cout <<"FALL" << endl;
+        vector <ll> dist = p.first;
+        vector <ll> parent = p.second;
+        if (dist[to] == inf) {
+            break;
+        }
+        ll v = to;
+        vector <ll> P;
+        while (v != from) {
+            P.pb(parent[v]);
+            v = E[parent[v]].v;
+        }
+        ll mn = inf, sum = 0;
+        for (auto i : P) {
+            sum += E[i].cost;
+            mn = min(mn, E[i].c - E[i].f);
+        }
+        // assert(mn > 0);
+        // cout << sum << " " << dist[to] << endl;
+        mn = min(bound - ans.first, mn);
+        ans.first += mn;
+        ans.second += mn * sum;
+        for (auto i : P) {
+            E[i].f += mn;
+            ll obr = E[i].r;
+            E[obr].f -= mn;
+        }
+    }
+    return ans;
+}
+
+inline void add_edge(ll i1, ll i2, ll c, ll cost) {
+    edge e, f;
+    e.v = f.to = i1; e.to = f.v = i2;
+    e.r = E.size() + 1; f.r = E.size();
+    e.c = c; f.c = 0;
+    e.cost = cost; f.cost = -e.cost;
+    V[i1].pb(E.size()); V[i2].pb(E.size() + 1);
+    E.pb(e); E.pb(f);
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>mcf</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

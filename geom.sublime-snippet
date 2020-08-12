@@ -1,0 +1,104 @@
+<snippet>
+    <content><![CDATA[
+struct point {
+    ld x;
+    ld y;
+    point() {
+        x = 0;
+        y = 0;
+    }
+    point(ld x_, ld y_) {
+        x = x_;
+        y = y_;
+    }
+    point operator-(point other) {
+        point ans;
+        ans.x = x - other.x;
+        ans.y = y - other.y;
+        return ans;
+    }
+    point operator+(point other) {
+        point ans;
+        ans.x = x + other.x;
+        ans.y = y + other.y;
+        return ans;
+    }
+};
+
+
+ld scal(point a, point b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+ld psev(point a, point b) {
+    return a.x * b.y - a.y * b.x;
+}
+
+ld len(point a) {
+    return sqrt(a.x * a.x + a.y * a.y);
+}
+
+struct line {
+    ld a, b, c;
+    line(ld a_, ld b_, ld c_) {
+        a = a_;
+        b = b_;
+        c = c_;
+    }
+    line(point a_, point b_) {
+        a = a_.y - b_.y;
+        b = b_.x - a_.x;
+        c = psev(a_, b_);
+    }
+};
+
+point intersect(line a, line b) {
+    point ans;
+    if (b.a == 0) {
+        if (a.a == 0) {
+            return {inf, inf};
+        }
+        ans.y = -b.c / b.b;
+        ans.x = (-a.c - a.b * ans.y) / a.a;
+        return ans;
+    }
+    if (a.a == 0) {
+        if (b.a == 0) {
+            return {inf, inf};
+        }
+        ans.y = -a.c / a.b;
+        ans.x = (-b.c - b.b * ans.y) / b.a;
+        return ans;
+    }
+    ld c = a.a / b.a;
+    b.a *= c;
+    b.b *= c;
+    b.c *= c;
+    if (a.b == b.b) {
+        return {inf, inf};
+    }
+    ans.y = (b.c - a.c) / (a.b - b.b);
+    ans.x = (-a.c - a.b * ans.y) / a.a;
+    return ans;
+}
+
+line per(line l, point x) {
+    ld na = -l.b, nb = l.a;
+    ld nc = -na * x.x - nb * x.y;
+    line per = {na, nb, nc};
+    return per;
+}
+
+point simm(line l, point x) {
+    point ans;
+    line pr = per(l, x);
+    point c = intersect(l, pr);
+    ans = c + (c - x);
+    return ans;
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>geom</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,101 @@
+<snippet>
+    <content><![CDATA[
+ll cnt_ver = 0;
+
+vector <ll> V[maxn];
+
+struct edge {
+    ll to;
+    ll r;
+    ll c;
+    ll f = 0;
+};
+
+vector <edge> E;
+
+ll D[maxn];
+
+ll from, to;
+
+ll P[maxn];
+
+bool bfs(ll v) {
+    ll q, w;
+    queue <ll> Q;
+    for (q = 0; q < cnt_ver; q++) {
+        D[q] = inf;
+    }
+    D[v] = 0;
+    Q.push(v);
+    while (!Q.empty()) {
+        ll v = Q.front();
+        Q.pop();
+        for (auto i : V[v]) {
+            edge e = E[i];
+            ll v1 = e.to;
+            if (D[v1] == inf && e.c - e.f > 0) {
+                D[v1] = D[v] + 1;
+                Q.push(v1);
+            }
+        }
+    }
+    return D[to] != inf;
+}
+
+ll dfs(ll v, ll mn) {
+    ll q;
+    if (v == to) {
+        return mn;
+    }
+    for (q = P[v]; q < V[v].size(); q++) {
+        edge e = E[V[v][q]];
+        ll v1 = e.to;
+        if (D[v1] == D[v] + 1) {
+            ll dmn = e.c - e.f;
+            if (dmn != 0) {
+                ll c = dfs(v1, min(mn, dmn));
+                if (c != 0) {
+                    E[V[v][q]].f += c;
+                    ll obr = E[V[v][q]].r;
+                    E[obr].f -= c;
+                    return c;
+                }
+            }          
+        }
+        P[v]++;
+    }
+    return 0;
+}
+
+ll dinic() {
+    ll q, w;
+    ll ans = 0;
+    while (bfs(from)) {
+        for (q = 0; q < cnt_ver; q++) {
+            P[q] = 0;
+        }
+        while (1) {
+            ll dans = dfs(from, inf);
+            if (dans == 0) {
+                break;
+            }
+            ans += dans;
+        }
+    }
+    return ans;
+}
+
+void add_edge(ll i1, ll i2, ll c) {
+    edge e, f;
+    f.to = i1; e.to = i2;
+    e.r = E.size() + 1; f.r = E.size();
+    e.c = c; f.c = 0;
+    V[i1].pb(E.size()); V[i2].pb(E.size() + 1);
+    E.pb(e); E.pb(f);
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>dinic</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

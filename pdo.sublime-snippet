@@ -1,0 +1,80 @@
+<snippet>
+	<content><![CDATA[
+struct vertex {
+	ll val = 0;
+	ll l = -1;
+	ll r = -1;
+};
+
+vector <vertex> V;
+
+ll RT[maxn];
+
+ll len;
+
+ll curver = 0;
+
+void r_child(ll v) {
+	vertex v1;
+	if (V[v].r != -1) {
+		v1 = V[V[v].r];
+	}
+	V.pb(v1);
+	V[v].r = V.size() - 1;
+}
+
+void l_child(ll v) {
+	vertex v2;
+	if (V[v].l != -1)v2 = V[V[v].l];
+	V.pb(v2);
+	// V[V.size() - 1];
+	V[v].l = V.size() - 1;
+}
+
+void expand(ll v) {
+	l_child(v);
+	r_child(v);
+}
+
+void build(ll v, ll tl, ll tr) {
+	if (tl == tr) {
+		return;
+	}
+	ll tm = (tl + tr) / 2;
+	expand(v);
+	build(V[v].l, tl, tm);
+	build(V[v].r, tm + 1, tr);
+}
+
+void update(ll v, ll tl, ll tr, ll i, ll color) {
+	if (tl > i || i > tr) {
+		return;
+	}
+	if (tl == tr) {
+		V[v].val = color;
+		return;
+	}
+	expand(v);
+	ll tm = (tl + tr) / 2;
+	update(V[v].l, tl, tm, i, color);
+	update(V[v].r, tm + 1, tr, i, color);
+	V[v].val = max(V[V[v].l].val, V[V[v].r].val);
+}
+
+void update(ll i, ll color) {
+	vertex emp;
+	// cout << "I COLOR " << i << " " << color << endl;
+	if (curver != 0) {
+		emp = V[RT[curver]];
+	}
+	V.pb(emp);
+	curver++;
+	RT[curver] = V.size() - 1;
+	update(RT[curver], 0, len - 1, i, color);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>pdo</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,76 @@
+<snippet>
+	<content><![CDATA[
+
+
+struct vertex {
+    ll l = -1, r = -1;
+    ll val = 0;
+    ll sz = 1;
+    ll y = rand();
+};
+ 
+vector <vertex> V1;
+ 
+inline ll getsz(ll v) {
+    if (v == -1) {
+        return 0;
+    }
+    return V1[v].sz;
+}
+ 
+inline void up(ll v) {
+    if (v == -1) {
+        return;
+    }
+    V1[v].sz = getsz(V1[v].l) + getsz(V1[v].r) + 1;
+}
+ 
+inline pll split(ll v, ll x) {
+    if (v == -1) {
+        return mp(-1, -1);
+    }
+    pll p;
+    if (getsz(V1[v].l) >= x) {
+        p = split(V1[v].l, x);
+        V1[v].l = p.second;
+        p.second = v;
+        up(v);
+        return p;
+    }
+    else {
+        p = split(V1[v].r, x - getsz(V1[v].l) - 1);
+        V1[v].r = p.first;
+        p.first = v;
+        up(v);
+        return p;
+    }
+}
+ 
+inline ll mrg(ll l, ll r) {
+    if (l == -1) {
+        return r;
+    }
+    if (r == -1) {
+        return l;
+    }
+    ll v1;
+    if (V1[l].y > V1[r].y) {
+        v1 = mrg(V1[l].r, r);
+        V1[l].r = v1;
+        up(l);
+        return l;
+    }
+    else {
+        v1 = mrg(l, V1[r].l);
+        V1[r].l = v1;
+        up(r);
+        return r;
+    }
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>descartes</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

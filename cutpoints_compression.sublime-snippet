@@ -1,0 +1,78 @@
+<snippet>
+    <content><![CDATA[
+vector <pll> V[maxn];
+
+bool used[maxn];
+
+bool is_cutpoint[maxn];
+
+ll D[maxn];
+
+ll H[maxn];
+
+ll C[maxn];
+
+ll timer = 1;
+
+void dfs(ll v, ll p) {
+    ll children = 0;
+    H[v] = timer;
+    timer++;
+    D[v] = H[v];
+    used[v] = 1;
+    for (auto p1 : V[v]) {
+        ll v1 = p1.first;
+        if (v1 == p) {
+            continue;
+        }
+        if (used[v1]) {
+            D[v] = min(D[v], H[v1]);
+        }
+        else {
+            dfs(v1, v);
+            D[v] = min(D[v], D[v1]);
+            if (D[v1] >= H[v] && v != p) {
+                is_cutpoint[v] = 1;
+            }
+            children++;
+        }
+    }
+    if (v == p && children > 1) {
+        is_cutpoint[v] = 1;
+    }
+}
+
+void dfs1(ll v, ll p, ll curcolor) {
+    used[v] = 1;
+    for (auto p1 : V[v]) {
+        ll v1 = p1.first;
+        ll i = p1.second;
+        if (v1 == p) {
+            continue;
+        }
+        if (used[v1]) {
+            if (H[v1] < H[v]) {
+                C[i] = curcolor;
+            }
+            continue;
+        }
+        else {
+            if (D[v1] >= H[v]) {
+                color++;
+                C[i] = color;
+                dfs1(v1, v, color);
+                // is_cutpoint[v] = 1;
+            }
+            else {
+                C[i] = curcolor;
+                dfs1(v1, v, curcolor);
+            }
+        }
+    }
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <!-- <tabTrigger>hello</tabTrigger> -->
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

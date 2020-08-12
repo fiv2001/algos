@@ -1,0 +1,71 @@
+<snippet>
+	<content><![CDATA[
+struct vertex {
+    ll to[maxc];
+    ll suf = -1;
+    ll p = -1;
+    bool term = 0;
+    vertex() {
+        ll q;
+        for (q = 0; q < maxc; q++) {
+            to[q] = -1;
+        }
+    }
+};
+
+ll len[maxn];
+
+struct pistol {
+    vector <vertex> V;
+    ll last = 0;
+    pistol() {
+        V.resize(1);
+    }
+    void add(ll x) {
+        vertex nw;
+        V.pb(nw);
+        V.back().p = last;
+        ll a, b;
+        ll i = last;
+        last = V.size() - 1;
+        while (1) {
+            if (V[i].to[x] != -1) {
+                a = i;
+                b = V[i].to[x];
+                break;
+            }
+            V[i].to[x] = V.size() - 1;
+            i = V[i].suf;
+            if (i == -1) {
+                V.back().suf = 0; 
+                return;
+            }
+        }
+        if (V[b].p == a) {
+            V.back().suf = b;
+            return;
+        }
+        V.back().suf = V.size();
+        V.pb(nw);
+        V.back().p = a;
+        i = a;
+        for (ll q = 0; q < maxc; q++) {
+            V.back().to[q] = V[b].to[q];
+        }
+        while (i != -1) {
+            if (V[i].to[x] != b) {
+                break;
+            }
+            V[i].to[x] = V.size() - 1;
+            i = V[i].suf;
+        }
+        V.back().suf = V[b].suf;
+        V[b].suf = V.size() - 1;
+    }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>pistol</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

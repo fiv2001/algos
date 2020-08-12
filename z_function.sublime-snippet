@@ -1,0 +1,24 @@
+<snippet>
+    <content><![CDATA[
+vector <ll> z_function(vector <ll> A) {
+    vector <ll> Z(A.size());
+    for (ll q = 1, l = 0, r = 0; q < A.size(); q++) {
+        if (q <= r) {
+            Z[q] = min(Z[q - l], r - q + 1);
+        }
+        while (q + Z[q] < A.size() && A[Z[q]] == A[q + Z[q]]) {
+            Z[q]++;
+        }
+        if (q + Z[q] - 1 > r) {
+            l = q;
+            r = q + Z[q] - 1;
+        } 
+    }
+    return Z;
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>z_function</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

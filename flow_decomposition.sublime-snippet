@@ -1,0 +1,101 @@
+<snippet>
+    <content><![CDATA[
+vector <vector <ll> > ANS;
+
+vector <ll> sizes;
+
+bool used[maxn];
+
+void clean(vector <ll> way) {
+    for (auto v : way) {
+        used[v] = 0;
+    }
+}
+
+ll kill_flow(vector <ll> Q) {
+    ll mn = inf;
+    for (auto i : Q) {
+        mn = min(mn, E[i].f);
+    }
+    for (auto i : Q) {
+        E[i].f -= mn;
+        ll obr = E[i].r;
+        E[obr].f += mn;
+    }
+    return mn;
+}
+
+vector <ll> make_vector(queue <ll> Q) {
+    vector <ll> ANS;
+    while (!Q.empty()) {
+        ll v = Q.front();
+        Q.pop();
+        ANS.pb(v);
+    }
+    return ANS;
+}
+
+pvb find_way(ll u) { /// is_cycle
+    vector <ll> DANS;
+    // vector <ll> DANS1;
+    vector <ll> way;
+    queue <ll> Q;
+    ll v = u;
+    way.pb(v);
+    while (v != to) {
+        ll ind = -1;
+        for (auto i : V[v]) {
+            if (E[i].f > 0) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind == -1) {
+            return mp(DANS, 0);
+        }
+        used[v] = 1;
+        DANS.pb(ind);
+        Q.push(ind);
+        ll v1 = E[ind].to;
+        if (used[v1]) {
+            while (!Q.empty()) {
+                ll i = Q.front();
+                Q.pop();
+                if (E[i].to == v1) {
+                    break;
+                }
+            }
+            vector <ll> Q1 = make_vector(Q);
+            kill_flow(Q1);
+            clean(way);
+            return mp(DANS, 1);
+        }
+        v = v1;
+        way.pb(v);
+    }
+    clean(way);
+    vector <ll> Q1 = make_vector(Q);
+    ll flow = kill_flow(Q1);
+    sizes.pb(flow);
+    return mp(DANS, 0);
+}
+
+void decompose() {
+    while (1) {
+        pvb p = find_way(from);
+        if (p.second) {
+            continue;
+        }
+        vector <ll> DANS = p.first;
+        if (DANS.size() == 0) {
+            break;
+        }
+        ANS.pb(DANS);
+    }
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>flow_decomposition</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

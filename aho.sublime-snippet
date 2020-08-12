@@ -1,0 +1,99 @@
+<snippet>
+    <content><![CDATA[
+struct vertex {
+    ll pch = 0;
+    ll p = -1;
+    ll link = -1;
+    ll fast = -1;
+    vector <ll> leaf;
+    ll go[maxc];
+    vertex() {
+        for (ll q = 0; q < maxc; q++) {
+            go[q] = -1;
+        }
+    };
+};
+
+struct aho {
+    vector <vertex> V;
+    aho() {
+        V.resize(1);
+    }
+    void add(string s, ll ind) { /// first add, then shit
+        ll v = 0;
+        for (ll i = 0; i < s.length(); i++) {
+            ll c = s[i] - 'a';
+            if (V[v].go[c] == -1) {
+                vertex nw;
+                V.pb(nw);
+                V[v].go[c] = V.size() - 1;
+                V.back().p = v;
+                V.back().pch = c;
+            }
+            v = V[v].go[c];
+        }
+        V[v].leaf.pb(ind);
+    }
+    ll link(ll v) {
+        if (V[v].link != -1) {
+            return V[v].link;
+        }
+        if (v == 0 || V[v].p == 0) {
+            V[v].link = 0;
+            return 0;
+        }
+        ll p = link(V[v].p);
+        ll v1 = go(p, V[v].pch);
+        // cout << p << " P" << endl;
+        V[v].link = v1;
+        // cout << v << " " << v1 << " LINK_DEBUG" << endl;
+        return v1;
+    }
+    ll go(ll v, ll c) {
+        if (V[v].go[c] != -1) {
+            return V[v].go[c];
+        }
+        if (v == 0) {
+            return 0;
+        }
+        ll v1 = link(v);
+        return go(v1, c);
+    }
+    void get_links() {
+        ll q;
+        for (q = 0; q < V.size(); q++) {
+            link(q);
+        }
+    }
+    ll fast(ll v) {
+        // cout << v << " V" << endl;
+        if (v == 0) {
+            return 0;
+        }
+        if (V[v].fast != -1) {
+            return V[v].fast;
+        }
+        ll link = V[v].link;
+        if (!V[link].leaf.empty()) {
+            return link;
+        }
+        return fast(link);
+    }
+    void get_fasts() {
+        ll q;
+        for (q = 0; q < V.size(); q++) {
+            fast(q);
+        }
+    }
+    void init() {
+        get_links();
+        // cout << "LINKS" << endl;
+        get_fasts();
+    }
+};
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>aho</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,27 @@
+<snippet>
+    <content><![CDATA[
+ll LP[maxa];
+
+vector <ll> pr;
+
+inline void fast_sieve() {
+    ll q;
+    for (q = 2; q < maxa; q++) {
+        if (LP[q] == 0) {
+            LP[q] = q;
+            pr.pb(q);
+        }
+        for (auto p1 : pr) {
+            if (p1 > LP[q] || p1 * q >= maxa) {
+                break;
+            }
+            LP[p1 * q] = p1;
+        }
+    }
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>fast_sieve</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

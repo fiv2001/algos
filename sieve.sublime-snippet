@@ -1,0 +1,21 @@
+<snippet>
+	<content><![CDATA[
+vector <ll> dels[maxa];
+
+void sieve() {
+    ll q, w;
+    for (q = 2; q < maxa; q++) {
+        if (!dels[q].empty()) {
+            continue;
+        }
+        for (w = q; w < maxa; w += q) {
+            dels[w].pb(q);
+        }
+    }
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>sieve</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

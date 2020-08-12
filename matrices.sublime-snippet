@@ -1,0 +1,40 @@
+<snippet>
+    <content><![CDATA[
+vvl multiply(vvl A, vvl B) {
+    // cout << "start" << endl;
+    ll q, w, e;
+    vvl ANS(A.size());
+    for (q = 0; q < ANS.size(); q++) {
+        ANS[q].resize(B[0].size());
+    }
+    // cout << A.size() << " " << A[0].size() << " " << B.size() << " " << B[0].size() << endl;
+    for (q = 0; q < A.size(); q++) {
+        // cout << "Q " << q << endl;
+        for (w = 0; w < B[0].size(); w++) {
+            for (e = 0; e < A[q].size(); e++) {
+                ANS[q][w] += A[q][e] * B[e][w] % mod;
+                // cout << q << " " << w << " " << e << endl;
+                ANS[q][w] %= mod;
+            }
+        }
+    }
+    // cout << "end" << endl;
+    return ANS;
+}
+
+vvl step(vvl A, ll x) {
+    if (x == 1) {
+        return A;
+    }
+    if (x % 2 == 1) {
+        return multiply(A, step(A, x - 1));
+    }
+    vvl A1 = step(A, x / 2);
+    return multiply(A1, A1);
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>matrices</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

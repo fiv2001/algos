@@ -1,0 +1,43 @@
+<snippet>
+    <content><![CDATA[
+bool used[maxn];
+
+bool is_cutpoint[maxn];
+
+ll D[maxn];
+
+ll H[maxn];
+
+void dfs(ll v, ll p) {
+    ll children = 0;
+    if (v != p) {
+        H[v] = H[p] + 1;
+    }
+    D[v] = H[v];
+    used[v] = 1;
+    for (auto v1 : V[v]) {
+        if (v1 == p) {
+            continue;
+        }
+        if (used[v1]) {
+            D[v] = min(D[v], H[v1]);
+        }
+        else {
+            dfs(v1, v);
+            D[v] = min(D[v], D[v1]);
+            if (D[v1] >= H[v] && v != p) {
+                is_cutpoint[v] = 1;
+            }
+            children++;
+        }
+    }
+    if (v == p && children > 1) {
+        is_cutpoint[v] = 1;
+    }
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>cutpoints</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

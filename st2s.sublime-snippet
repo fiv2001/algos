@@ -1,0 +1,12 @@
+<snippet>
+	<content><![CDATA[
+st2[0] = 1;
+for (q = 1; q < 63; q++) {
+  	st2[q] = st2[q - 1] * 2;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>st2s</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
