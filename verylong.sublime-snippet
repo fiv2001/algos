@@ -1,0 +1,259 @@
+<snippet>
+	<content><![CDATA[
+const ld PI = acos(-1);
+
+ll rev(ll x, ll lg) {
+    ll ans = 0;
+    ll q;
+    for (q = 0; q < lg; q++) {
+        if ((x & (1 << q)) != 0) {
+            ans += (1<<(lg - q - 1))/*st2[lg - q - 1]*/;
+        }
+    }
+    return ans;
+}
+
+void fft(vector <cld> &A, bool inv) {
+    ll lg = 0, n = 1;
+    while (n < A.size()) {
+        n *= 2;
+        lg++;
+    }
+    for (ll q = 0; q < A.size(); q++) {
+        if (q < rev(q, lg)) {
+            swap(A[q], A[rev(q, lg)]);
+        }
+    }
+    assert(n == A.size());
+    for (ll len = 2; len <= n; len *= 2) {
+        double ang = 2 * PI / len;
+        if (inv) {
+            ang *= -1;
+        }
+        cld base(cos(ang), sin(ang));
+        for (ll q = 0; q < n; q += len) {
+            cld w1 = 1;
+            for (ll w = q; w < q + len / 2; w++) {
+                cld x1 = A[w] + w1 * A[w + len / 2];
+                cld x2 = A[w] - w1 * A[w + len / 2];
+                A[w] = x1;
+                A[w + len / 2] = x2;
+                w1 *= base;
+            }
+        }
+    }
+    if (inv) {
+        for (ll q = 0; q < A.size(); q++) {
+            A[q] /= n;
+        }
+    }
+}
+
+vector <ll> multiply(vector <ll> A, vector <ll> B) {
+    vector <cld> A1(A.begin(), A.end()), B1(B.begin(), B.end());
+    ll n = 1;
+    while (n < max(A.size(), B.size())) {
+        n *= 2;
+    }
+    n *= 2;
+    A1.resize(n); B1.resize(n);
+    // cout << n << endl;
+    fft(A1, 0);
+    fft(B1, 0);
+    for (ll q = 0; q < A1.size(); q++) {
+        A1[q] = A1[q] * B1[q];
+    }
+    fft(A1, 1);
+    vector <ll> ANS(A1.size());
+    for (ll q = 0; q < A1.size(); q++) {
+        ANS[q] = (int)(A1[q].real() + 0.5);
+    }
+    return ANS;
+}
+
+struct verylong {
+    ll mod = 10;
+    vector <ll> digits;
+    bool neg = 0;
+    void normalize() {
+        while (!digits.empty()) {
+            if (digits.back() == 0) {
+                digits.pop_back();
+            }
+            else {
+                break;
+            }
+        }
+        if (digits.size() == 0) {
+            neg = 0;
+        }
+    }
+    verylong(string s) {
+        if (s[0] == '-') {
+            neg = 1;
+            s[0] = '0';
+        }
+        digits.clear();
+        for (ll q = (ll)s.length() - 1; q >= 0; q--) {
+            digits.pb(s[q] - '0');
+        }
+        normalize();
+    }
+    verylong(int a = 0) {
+        if (a < 0) {
+            a = -a;
+            neg = 1;
+        }
+        digits.clear();
+        while (a != 0) {
+            digits.pb(a % 10);
+            a /= 10;
+        }
+        reverse(all(digits));
+        normalize();
+    }
+    verylong operator*(const verylong other) const {
+        // normalize(); other.normalize();
+        verylong ans;
+        ans.neg = neg ^ other.neg;
+        ans.digits = multiply(digits, other.digits);
+        ans.normalize();
+        return ans;
+    }
+    verylong operator-() const {
+        // normalize();
+        verylong ans = *this;
+        ans.neg ^= 1;
+        ans.normalize();
+        return ans;
+    }
+    bool operator<(verylong other) {
+        normalize(); other.normalize();
+        if (neg != other.neg) {
+            return neg > other.neg;
+        }
+        // verylong x = *this, y = other;
+        bool ans = 0;
+        if (digits.size() != other.digits.size()) {
+            ans = digits.size() < other.digits.size();
+            return ans ^ neg;
+        }
+        for (ll q = digits.size() - 1; q >= 0; q--) {
+            if (digits[q] != other.digits.size()) {
+                ans = digits[q] < other.digits[q];
+                return ans ^ neg;
+            }
+        }
+        return 0;
+    }
+    bool operator==(verylong other) {
+        // normalize(); other.normalize();
+        return (neg == other.neg && digits == other.digits);
+    }
+    bool operator>(verylong other) {
+        return other < *this;
+    }
+    verylong operator-(verylong other) {
+        verylong ans;
+        normalize(); other.normalize();
+        while (other.digits.size() < digits.size()) {
+            other.digits.pb(0);
+        }
+        while (other.digits.size() > digits.size()) {
+            digits.pb(0);
+        }
+        if (other.neg) {
+            return (-other) + *this;
+        }
+        if (neg) {
+            return -((-*this) + (other));
+        }
+        if (other > *this) {
+            return -(other - *this);
+        }
+        // cout << "MINUS " << neg << " " << other.neg << endl;
+        ll carry = 0;
+        for (ll q = 0; q < digits.size(); q++) {
+            if (digits[q] + carry >= other.digits[q]) {
+                ans.digits.pb(digits[q] + carry - other.digits[q]);
+                carry = 0;
+            }
+            else {
+                ans.digits.pb(digits[q] + carry - other.digits[q] + mod);
+                carry = -1;
+            }
+        }
+        ans.normalize();
+        return ans;
+    }
+    verylong operator+(verylong other) {
+        verylong ans;
+        normalize(); other.normalize();
+        while (other.digits.size() < digits.size()) {
+            other.digits.pb(0);
+        }
+        while (other.digits.size() > digits.size()) {
+            digits.pb(0);
+        }
+        // cout << "PLUS" << endl;
+        ll q;
+        if (!neg) {
+            if (!other.neg) {
+                ll carry = 0;
+                for (q = 0; q < digits.size(); q++) {
+                    ans.digits.pb((digits[q] + other.digits[q] + carry) % mod);
+                    carry = (digits[q] + other.digits[q] + carry) / mod;
+                }
+                ans.digits.pb(carry);
+                ans.normalize();
+                return ans;
+            }
+            else {
+                if (*this > -other) {
+                    return *this - (-other);
+                }
+                else {
+                    return -(-other - *this);
+                }
+            }
+        }
+        else {
+            if (!other.neg) {
+                return other + *this;
+            }
+            else {
+                // cout << "HERE " << endl;
+                return -((-*this) + (-other));
+            }
+        }
+    }
+};
+
+istream& operator>>(istream& is, verylong &x) {
+    // cout << "HERE" << endl;
+    string s;
+    is >> s;
+    x = verylong(s);
+    x.normalize();
+    return is;
+}
+ostream& operator<<(ostream& os, const verylong &x) {
+    // x.normalize();
+    if (x.digits.empty()) {
+        os << 0;
+        return os;
+    }
+    if (x.neg) {
+        os << '-';
+    }
+    for (ll q = x.digits.size() - 1; q >= 0; q--) {
+        os << x.digits[q];
+    }
+    return os;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>verylong</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

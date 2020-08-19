@@ -1,0 +1,93 @@
+<snippet>
+	<content><![CDATA[
+const ld PI = acos(-1);
+
+ll st2[maxn];
+
+ll rev(ll x, ll lg) {
+    ll ans = 0;
+    ll q;
+    for (q = 0; q < lg; q++) {
+        if ((x & (1 << q)) != 0) {
+            ans += (1<<(lg - q - 1))/*st2[lg - q - 1]*/;
+        }
+    }
+    return ans;
+}
+
+void fft(vector <cld> &A, bool inv) {
+    ll lg = 0, n = 1;
+    while (n < A.size()) {
+        n *= 2;
+        lg++;
+    }
+    // cout << n << " " << lg << endl;
+    for (ll q = 0; q < A.size(); q++) {
+        if (q < rev(q, lg)) {
+            swap(A[q], A[rev(q, lg)]);
+        }
+    }
+    assert(n == A.size());
+    for (ll len = 2; len <= n; len *= 2) {
+        double ang = 2 * PI / len;
+        // cout << ang / PI << " ANG" << endl;
+        if (inv) {
+            ang *= -1;
+        }
+        // cout << endl;
+        // for (ll q = 0; q < A.size(); q++) {
+        //     cout << A[q] << " ";
+        // }
+        // cout << endl;
+        // cout << ang << " ANG " << cos(ang) << " " << sin(ang) << endl;
+        cld base(cos(ang), sin(ang));
+        // cout << base << " BASE" << endl;
+        for (ll q = 0; q < n; q += len) {
+            cld w1 = 1;
+            for (ll w = q; w < q + len / 2; w++) {
+                cld x1 = A[w] + w1 * A[w + len / 2];
+                cld x2 = A[w] - w1 * A[w + len / 2];
+                A[w] = x1;
+                A[w + len / 2] = x2;
+                w1 *= base;
+            }
+        }
+        // for (ll q = 0; q < A.size(); q++) {
+        //     cout << A[q] << " ";
+        // }
+        // cout << endl;
+    }
+    if (inv) {
+        for (ll q = 0; q < A.size(); q++) {
+            A[q] /= n;
+        }
+    }
+}
+
+vector <ll> multiply(vector <ll> A, vector <ll> B) {
+    vector <cld> A1(A.begin(), A.end()), B1(B.begin(), B.end());
+    ll n = 1;
+    while (n < max(A.size(), B.size())) {
+        n *= 2;
+    }
+    n *= 2;
+    A1.resize(n); B1.resize(n);
+    // cout << n << endl;
+    fft(A1, 0);
+    fft(B1, 0);
+    for (ll q = 0; q < A1.size(); q++) {
+        A1[q] = A1[q] * B1[q];
+    }
+    fft(A1, 1);
+    vector <ll> ANS(A1.size());
+    for (ll q = 0; q < A1.size(); q++) {
+        ANS[q] = (int)(A1[q].real() + 0.5);
+    }
+    return ANS;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>fft</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
