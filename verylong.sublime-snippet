@@ -66,7 +66,7 @@ vector <ll> multiply(vector <ll> A, vector <ll> B) {
     fft(A1, 1);
     vector <ll> ANS(A1.size());
     for (ll q = 0; q < A1.size(); q++) {
-        ANS[q] = (int)(A1[q].real() + 0.5);
+        ANS[q] = (ll)(A1[q].real() + 0.5);
     }
     return ANS;
 }
