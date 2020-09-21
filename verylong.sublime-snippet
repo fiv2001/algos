@@ -117,6 +117,16 @@ struct verylong {
         verylong ans;
         ans.neg = neg ^ other.neg;
         ans.digits = multiply(digits, other.digits);
+        int carry = 0;
+        for (int i = 0; i < ans.digits.size(); i++) {
+            int sum = carry + ans.digits[i];
+            ans.digits[i] = sum % mod;
+            carry = sum / mod;
+        }
+        while (carry != 0) {
+            ans.digits.pb(carry % mod);
+            carry /= mod;
+        }
         ans.normalize();
         return ans;
     }
@@ -250,8 +260,7 @@ ostream& operator<<(ostream& os, const verylong &x) {
         os << x.digits[q];
     }
     return os;
-}
-]]></content>
+}]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>verylong</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
