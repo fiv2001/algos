@@ -11,6 +11,18 @@ struct point {
         x = x_;
         y = y_;
     }
+    bool operator==(point other) {
+        return x == other.x && y == other.y;
+    }
+    bool operator!=(point other) {
+        return !(*this == other);
+    }
+    bool operator<(point other) {
+        return x < other.x || (x == other.x && y < other.y);
+    }
+    bool operator>(point other) {
+        return other < *this;
+    }
     point operator-(point other) {
         point ans;
         ans.x = x - other.x;
@@ -23,8 +35,49 @@ struct point {
         ans.y = y + other.y;
         return ans;
     }
+    void fix_len(ld length) {
+        ld nx, ny;
+        if (x == 0) {
+            if (y < 0) {
+                y = -length;
+            }
+            else {
+                y = length;
+            }
+            return;
+        }
+        ld k = y * 1.0 / x;
+        nx = sqrt(length * length / (1 + k * k));
+        if ((nx < 0 && x > 0) || (nx > 0 && x < 0)) {
+            nx *= -1;   
+        }
+        ny = nx * k;
+        x = nx;
+        y = ny;
+    }
 };
 
+istream& operator>>(istream& f, point &p) {
+    f >> p.x >> p.y;
+    return f;
+}
+
+ostream& operator<<(ostream& f, const point p) {
+    f << p.x << " " << p.y;
+    return f;
+}
+
+
+point rotate(point p, ld sn, ld cs) {
+    point ans;
+    ans.x = p.x * cs - p.y * sn;
+    ans.y = p.x * sn + p.y * cs;
+    return ans;
+}
+
+point rotate(point x, ld ang) {
+    return rotate(x, sin(ang), cos(ang));
+}
 
 ld scal(point a, point b) {
     return a.x * b.x + a.y * b.y;
@@ -36,6 +89,10 @@ ld psev(point a, point b) {
 
 ld len(point a) {
     return sqrt(a.x * a.x + a.y * a.y);
+}
+
+ll len2(point a) {
+    return (a.x * a.x + a.y * a.y);
 }
 
 struct line {
@@ -95,6 +152,39 @@ point simm(line l, point x) {
     point c = intersect(l, pr);
     ans = c + (c - x);
     return ans;
+}
+
+vector <point> okr_intersect(point c1, point c2, ld r1, ld r2) {
+    ld l = len(c1 - c2);
+    if (c1 == c2 && r1 == r2) {
+        return {{inf, inf}};
+    }
+    if (r2 > r1) {
+        swap(r1, r2);
+        swap(c1, c2);
+    }
+    if (l > r1 + r2 || l < r1 - r2) {
+        return {};
+    }
+    if (l == r1 + r2) {
+        point p = c2 - c1;
+        p.fix_len(r1);
+        point ans = c1 + p;
+        return {ans};
+    }
+    if (l == r1 - r2) {
+        point p = c2 - c1;
+        p.fix_len(r1);
+        return {c1 + p};
+    }
+    ld cs = (r1 * r1 + l * l - r2 * r2) * 1.0 / (2 * r1 * l);
+    ld sn = sqrt(1 - cs * cs);
+    point p = c2 - c1;
+    p.fix_len(r1);
+    // cout << "P " << p << endl;
+    point p1 = rotate(p, sn, cs);
+    point p2 = rotate(p, -sn, cs);
+    return {c1 + p1, c1 + p2};
 }
 ]]></content>
     <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
