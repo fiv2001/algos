@@ -1,0 +1,36 @@
+<snippet>
+	<content><![CDATA[
+struct fenv {
+    vector<ll> t;
+    ll n;
+    void init (ll nn)
+    {
+        n = nn;
+        t.assign (n, 0);
+    }
+
+    ll sum (ll r)
+    {
+        ll result = 0;
+        for (; r >= 0; r = (r & (r+1)) - 1)
+            result += t[r];
+        return result;
+    }
+
+    void inc (ll i, ll delta)
+    {
+        for (; i < n; i = (i | (i+1)))
+            t[i] += delta;
+    }
+
+    ll sum (ll l, ll r)
+    {
+        return sum (r) - sum (l-1);
+    }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>fenv</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
