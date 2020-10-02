@@ -1,0 +1,65 @@
+<snippet>
+	<content><![CDATA[
+const ll maxlog = 20;
+
+ll up[maxn][maxlog];
+
+ll H[maxn];
+
+ll tin[maxn];
+
+ll tout[maxn];
+
+inline bool is_parent(ll v, ll u) {
+    return tin[v] <= tin[u] && tout[v] >= tout[u];
+}
+
+ll timer = 1;
+
+void dfs0(ll v, ll p) {
+    if (v != p) {
+        H[v] = H[p] + 1;
+    }
+    up[v][0] = p;
+    tin[v] = timer;
+    timer++;
+    for (ll q = 1; q < maxlog; q++) {
+        up[v][q] = up[up[v][q - 1]][q - 1];
+    }
+    for (auto v1 : V[v]) {
+        if (v1 == p) {
+            continue;
+        }
+        dfs0(v1, v);
+    }
+    tout[v] = timer;
+    timer++;
+}
+
+ll lca(ll v, ll u) {
+    if (is_parent(v, u)) {
+        return v;
+    }
+    if (is_parent(u, v)) {
+        return u;
+    }
+    ll v1 = v;
+    for (ll q = maxlog - 1; q >= 0; q--) {
+        ll v2 = up[v1][q];
+        if (!is_parent(v2, u)) {
+            v1 = v2;
+        }
+    }
+    return up[v1][0];
+}
+
+ll getlen(ll v, ll u) {
+    ll l = lca(v, u);
+    return H[v] + H[u] - 2 * H[l];
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>lca</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

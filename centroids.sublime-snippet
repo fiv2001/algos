@@ -1,0 +1,52 @@
+<snippet>
+	<content><![CDATA[
+vector <ll> C(maxn, -1);
+
+vector <ll> all;
+
+vector <ll> PC(maxn, -1);
+
+ll SZ[maxn];
+
+void dfs(ll v, ll p) {
+    if (C[v] != -1) {
+        return;
+    }
+    SZ[v] = 1;
+    for (auto v1 : V[v]) {
+        if (v1 == p) {
+            continue;
+        }
+        dfs(v1, v);
+        if (C[v1] == -1) {
+            SZ[v] += SZ[v1];
+        }
+    }
+    all.pb(v);
+}
+
+ll findc(ll v, ll i) {
+    ll q;
+    all.clear();
+    dfs(v, v);
+    ll mn = all.back();
+    for (auto v1 : all) {
+        if (SZ[v1] * 2 > SZ[v] && SZ[v1] < SZ[mn]) {
+            mn = v1;
+        }
+    }
+    C[mn] = i;
+    // cout << mn << " MN" << endl;
+    for (auto v1 : V[mn]) {
+        if (C[v1] == -1) {
+            PC[findc(v1, i + 1)] = mn;
+        }
+    }
+    return mn;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>centroids</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
