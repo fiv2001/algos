@@ -1,0 +1,136 @@
+<snippet>
+	<content><![CDATA[
+struct point {
+    ld x, y, z;
+    point(ld x_, ld y_, ld z_) {
+        x = x_;
+        y = y_;
+        z = z_;
+    }
+    point() {
+        x = y = z = 0;
+    }
+
+    point operator-(point b) {
+        return point(x - b.x, y - b.y, z - b.z);
+    }
+    point operator+(point b) {
+        return point(x + b.x, y + b.y, z + b.z);
+    }
+    bool operator<(const point b) const {
+        if (x != b.x) {
+            return x < b.x;
+        }
+        if (y != b.y) {
+            return y < b.y;
+        }
+        return z < b.z;
+    }
+    bool operator==(const point b) const {
+        return !(*this < b || b < *this);
+    }
+};
+
+istream& operator>>(istream& f, point &p) {
+    f >> p.x >> p.y >> p.z;
+    return f;
+}
+
+ostream& operator<<(ostream& f, const point p) {
+    f << "(" << p.x << " " << p.y << " " << p.z << ")";
+    return f;
+}
+
+struct plane {
+    ld a, b, c, d;
+    plane() {
+        a = b = c = d = 0;
+    }
+    void invert() {
+        a = -a;
+        b = -b;
+        c = -c;
+        d = -d;
+    }
+    plane(point p1, point p2, point p3) {
+        ld x1 = p1.x, x2 = p2.x, x3 = p3.x,
+        y1 = p1.y, y2 = p2.y, y3 = p3.y, 
+        z1 = p1.z, z2 = p2.z, z3 = p3.z;
+        // WHY?
+        a = y1 * z2 - y1 * z3 - y2 * z1 + y3 * z1 - y3 * z2 + y2 * z3; 
+        b = x2 * z1 - x3 * z1 - x1 * z2 + x3 * z2 + x1 * z3 - x2 * z3;
+        c = x3 * y1 - x2 * y1 + x1 * y2 - x3 * y2 - x1 * y3 + x2 * y3;
+        d = -x3 * y1 * z2 + x2 * y1 * z3 + x3 * y2 * z1 - x2 * y3 * z1 
+            + x1 * y3 * z2 - x1 * y2 * z3;
+        if (a > 0) {
+            invert();
+        }
+    }
+    ld dist(point p) {
+        if (a == 0 && b == 0 && c == 0) {
+            return 0;
+        }
+        ld ans = (a * p.x + b * p.y + c * p.z + d) * 1.0 / (sqrt(a * a + b * b + c * c));
+        return ans;
+    }
+};
+
+point cross(point a, point b) {
+    return point(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+}
+
+ld dot(point a, point b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+ld volume(point p1, point p2, point p3, point p4) {
+    point v1 = p2 - p1, v2 = p3 - p1, v3 = p4 - p1;
+    return abs(dot(v1, cross(v2, v3))) * 1.0 / 6;
+}
+
+vector <vector <point> > conv_hull(vector <point> P) { /// P.size() >= 4
+    vector <vector <point> > ANS;
+    ll q, w, e;
+    for (q = 0; q < P.size(); q++) {
+        for (w = q + 1; w < P.size(); w++) {
+            for (e = w + 1; e < P.size(); e++) {
+                plane x(P[q], P[w], P[e]);
+                bool pos = 0, neg = 0;
+                for (ll i = 0; i < P.size(); i++) {
+                    if (x.dist(P[i]) > 0) {
+                        pos = 1;
+                    }
+                    if (x.dist(P[i]) < 0) {
+                        neg = 1;
+                    }
+                }
+                if (!(pos && neg)) {
+                    ANS.pb({});
+                    for (ll i = 0; i < P.size(); i++) {
+                        if (x.dist(P[i]) == 0) {
+                            ANS.back().pb(P[i]);
+                        }
+                    }
+                    sort(all(ANS.back()));
+                    bool f = 0;
+                    for (ll i = 0; i + 1 < ANS.size(); i++) {
+                        if (ANS.back() == ANS[i]) {
+                            f = 1;
+                            break;
+                        }
+                    }
+                    if (f) {
+                        ANS.pop_back();
+                    }
+                }
+            }
+        }
+    }
+    return ANS;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>stereom</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
