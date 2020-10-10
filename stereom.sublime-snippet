@@ -1,5 +1,6 @@
 <snippet>
 	<content><![CDATA[
+
 struct point {
     ld x, y, z;
     point(ld x_, ld y_, ld z_) {
@@ -28,6 +29,13 @@ struct point {
     }
     bool operator==(const point b) const {
         return !(*this < b || b < *this);
+    }
+    void set_len(ld nlen) {
+        ld curlen = sqrt((x * x + y * y + z * z));
+        ld coef = nlen / curlen;
+        x *= coef;
+        y *= coef;
+        z *= coef;
     }
 };
 
@@ -87,6 +95,38 @@ ld volume(point p1, point p2, point p3, point p4) {
     point v1 = p2 - p1, v2 = p3 - p1, v3 = p4 - p1;
     return abs(dot(v1, cross(v2, v3))) * 1.0 / 6;
 }
+
+ld len(point p) {
+    return sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+}
+
+ld point_to_line(point p, point s, point v) { /// point, start (on line), vector (of line)
+    return (len(cross(s - p, v)))/(len(v));
+}
+
+ld point_to_seg(point p, point l, point r) {
+    point v = r - l;
+    // cout << v << " " << p - l << endl;
+    if (dot(v, p - l) <= 0) {
+        // cout << "CASE 1" << endl;
+        return len(p - l);
+    }
+    if (dot(v, p - r) >= 0) {
+        // cout << "CASE 2" << endl;
+        return len(p - r);
+    }
+    // cout << "CASE 3" << endl;
+    return point_to_line(p, l, r - l);
+} 
+
+ld point_to_ray(point p, point l, point v) {
+    if (dot(v, p - l) <= 0) {
+        // cout << "CASE 1" << endl;
+        return len(p - l);
+    }
+    return point_to_line(p, l, v);
+}
+
 
 vector <vector <point> > conv_hull(vector <point> P) { /// P.size() >= 4
     vector <vector <point> > ANS;
